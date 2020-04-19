@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:19:57 PM PDT
-// Modified: Sat 18 Apr 2020 04:59:58 PM PDT
+// Modified: Sun 19 Apr 2020 04:58:51 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -29,9 +29,17 @@ pub mod stdlib;
 pub mod string;
 
 #[cfg(target_family = "unix")]
+#[doc(hidden)]
 pub mod posix;
+#[cfg(target_family = "unix")]
+#[doc(inline)]
+pub use posix::grp;
+#[cfg(target_family = "unix")]
+#[doc(inline)]
+pub use posix::pwd;
 
 #[cfg(target_family = "windows")]
+#[doc(hidden)]
 pub mod windows;
 
 mod util;

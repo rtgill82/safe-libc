@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:19 PM PDT
-// Modified: Sat 18 Apr 2020 03:22:28 AM PDT
+// Modified: Sun 19 Apr 2020 04:32:59 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -25,7 +25,9 @@
 //
 
 #[cfg(target_family = "unix")]
+#[doc(inline)]
 pub use crate::posix::string::strerror;
 
 #[cfg(target_family = "windows")]
+#[doc(inline)]
 pub use crate::windows::string::strerror;

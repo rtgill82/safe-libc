@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:19:12 PM PDT
-// Modified: Sat 18 Apr 2020 03:47:08 PM PDT
+// Modified: Sun 19 Apr 2020 04:32:13 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -30,9 +30,11 @@ use std::{error,result};
 use crate::string::strerror;
 
 #[cfg(target_family = "unix")]
+#[doc(inline)]
 pub use crate::posix::errno::*;
 
 #[cfg(target_family = "windows")]
+#[doc(inline)]
 pub use crate::windows::errno::*;
 
 pub type Result<T> = result::Result<T, Error>;

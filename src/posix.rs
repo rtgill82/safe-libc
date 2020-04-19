@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 09:34:22 PM PDT
-// Modified: Sat 18 Apr 2020 03:01:02 AM PDT
+// Modified: Sun 19 Apr 2020 04:38:18 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -24,9 +24,11 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+#[doc(hidden)]
 pub mod errno;
 pub mod grp;
 pub mod pwd;
 pub mod resource;
+#[doc(hidden)]
 pub mod string;
 pub mod unistd;
