@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 11:55:31 PM PDT
-// Modified: Sat 18 Apr 2020 02:54:43 PM PDT
+// Modified: Sun 19 Apr 2020 08:04:19 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -31,40 +31,64 @@ use crate::stdlib::realloc;
 use crate::errno::{Error,Result};
 use crate::errno;
 
-pub fn strerror(errno: i32) -> Result<String> {
+const BUF_SIZE: usize = 512;
+
+macro_rules! rv2errnum {
+    ($rv:ident) => {
+        match $rv {
+             0 => 0,
+            -1 => errno::errno(),
+            _  => $rv
+        }
+    }
+}
+
+pub fn strerror(errnum: i32) -> Result<String> {
     unsafe {
-        let mut buflen: usize = libc::BUFSIZ as usize;
+        let mut buflen = BUF_SIZE;
         let buf = ptr::null_mut();
 
         loop {
             let buf = realloc(buf, buflen)?;
-            let rv = libc::strerror_r(errno, buf as *mut i8, buflen);
-            match rv {
-                0  => { // success
-                    let buf = buf as *mut i8;
-                    let string = CString::from_raw(buf).into_string().unwrap();
-                    return Ok(string);
-                },
+            let rv = libc::strerror_r(errnum, buf as *mut i8, buflen);
+            let errnum = rv2errnum!(rv);
 
-                _  => { // failure
-                    let errnum;
-                    if rv == -1 {
-                        errnum = errno::errno();
-                    } else {
-                        errnum = rv;
-                    };
-
-                    if errnum != libc::ERANGE {
-                        libc::free(buf);
-                        return Err(Error::new(errnum));
-                    }
-
-                    // else reallocate and try again
-                    buflen *= 2;
-                }
+            if errnum == 0 { // success
+                let buf = buf as *mut i8;
+                let string = CString::from_raw(buf).into_string().unwrap();
+                return Ok(string);
             }
+
+            if errnum == libc::EINVAL {
+                let buf = buf as *mut i8;
+                let string = CString::from_raw(buf).into_string().unwrap();
+                return Err(Error::new_msg(errnum, string));
+            }
+
+            // reallocate and try again
+            buflen *= 2;
         }
     }
+}
+
+// strerror with static buffer
+pub(crate) fn strerror_s(errnum: i32) -> Result<String> {
+    let mut buf: [u8; BUF_SIZE] = [0; BUF_SIZE];
+
+    let rv = unsafe {
+        libc::strerror_r(errnum, buf.as_mut_ptr() as *mut i8, BUF_SIZE)
+    };
+
+    let errnum = rv2errnum!(rv);
+    if errnum == libc::ERANGE {
+        buf[BUF_SIZE - 1] = 0;
+    }
+
+    let string = String::from_utf8_lossy(&buf).to_string();
+    if errnum == libc::EINVAL {
+        return Err(Error::new_msg(errnum, string));
+    }
+    Ok(string)
 }
 
 #[cfg(test)]

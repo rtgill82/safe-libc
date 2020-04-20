@@ -1,6 +1,6 @@
 //
 // Created:  Sat 18 Apr 2020 03:10:57 AM PDT
-// Modified: Sat 18 Apr 2020 02:16:17 PM PDT
+// Modified: Sun 19 Apr 2020 07:48:46 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -28,12 +28,14 @@ use std::ffi::OsString;
 use std::os::windows::ffi::OsStringExt;
 use std::slice;
 
-use crate::errno::{Error,Result};
-use crate::errno;
+use crate::errno::Result;
 
 extern "C" {
     fn _wcserror(errnum: libc::c_int) -> *const libc::wchar_t;
 }
+
+#[allow(non_upper_case_globals)]
+pub const strerror_s: fn(i32) -> Result<String> = strerror;
 
 pub fn strerror(errno: i32) -> Result<String> {
     unsafe {

@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:13 PM PDT
-// Modified: Sat 18 Apr 2020 05:35:29 PM PDT
+// Modified: Sun 19 Apr 2020 07:44:00 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -24,31 +24,40 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+use crate::errno;
 use crate::errno::{Error,Result};
 use crate::VoidPtr;
 
-// FIXME: The `strerror()` function used when initializing the `Error`
-// struct calls `realloc()` in a loop when trying to allocate it's string
-// buffer.  Returning `Error` from the functions in this module may cause
-// infinite recursion when memory is tight. Should these be marked as `unsafe`?
-// I believe the likelihood of this occurring is rare.
+#[cfg(target_family = "unix")]
+use crate::posix::string::strerror_s;
+
+#[cfg(target_family = "windows")]
+use crate::windows::string::strerror_s;
+
+macro_rules! try_alloc {
+    ($fn:expr) => {
+        let ptr = $fn;
+        match ptr.is_null() {
+            false => return Ok(ptr),
+            true  => {
+                let errnum = errno::errno();
+                match strerror_s(errnum) {
+                    Ok(errmsg) => return Err(Error::new_msg(errnum, errmsg)),
+                    Err(err) => return Err(err)
+                }
+            }
+        }
+    }
+}
 
 pub fn malloc(size: usize) -> Result<VoidPtr> {
     unsafe {
-        let ptr = libc::malloc(size);
-        match ptr.is_null() {
-            true  => Err(Error::errno()),
-            false => Ok(ptr)
-        }
+        try_alloc!(libc::malloc(size));
     }
 }
 
 pub fn realloc(ptr: VoidPtr, size: usize) -> Result<VoidPtr> {
     unsafe {
-        let ptr = libc::realloc(ptr, size);
-        match ptr.is_null() {
-            true  => Err(Error::errno()),
-            false => Ok(ptr)
-        }
+        try_alloc!(libc::realloc(ptr, size));
     }
 }

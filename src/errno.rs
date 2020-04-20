@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:19:12 PM PDT
-// Modified: Sun 19 Apr 2020 04:32:13 PM PDT
+// Modified: Sun 19 Apr 2020 07:10:59 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -46,7 +46,13 @@ pub struct Error {
 
 impl Error {
     pub fn new(errnum: i32) -> Error {
-        let errmsg = strerror(errnum).unwrap();
+        match strerror(errnum) {
+            Ok(errmsg) => Error { errmsg, errnum },
+            Err(err) => err
+        }
+    }
+
+    pub fn new_msg(errnum: i32, errmsg: String) -> Error {
         Error { errmsg, errnum }
     }
 
