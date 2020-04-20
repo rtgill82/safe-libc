@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 11:55:31 PM PDT
-// Modified: Sun 19 Apr 2020 08:04:19 PM PDT
+// Modified: Sun 19 Apr 2020 08:20:30 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -55,13 +55,15 @@ pub fn strerror(errnum: i32) -> Result<String> {
 
             if errnum == 0 { // success
                 let buf = buf as *mut i8;
-                let string = CString::from_raw(buf).into_string().unwrap();
+                let string = CString::from_raw(buf)
+                    .to_string_lossy().to_string();
                 return Ok(string);
             }
 
             if errnum == libc::EINVAL {
                 let buf = buf as *mut i8;
-                let string = CString::from_raw(buf).into_string().unwrap();
+                let string = CString::from_raw(buf)
+                    .to_string_lossy().to_string();
                 return Err(Error::new_msg(errnum, string));
             }
 
