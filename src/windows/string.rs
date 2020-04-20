@@ -1,6 +1,6 @@
 //
 // Created:  Sat 18 Apr 2020 03:10:57 AM PDT
-// Modified: Sun 19 Apr 2020 07:48:46 PM PDT
+// Modified: Sun 19 Apr 2020 09:19:22 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <locke@sdf.org>
 //
@@ -39,6 +39,7 @@ pub const strerror_s: fn(i32) -> Result<String> = strerror;
 
 pub fn strerror(errno: i32) -> Result<String> {
     unsafe {
+        // _wcserror is thread safe
         let msg = _wcserror(errno);
         let len = libc::wcslen(msg);
         let msg = slice::from_raw_parts(msg, len);
