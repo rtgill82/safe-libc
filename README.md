@@ -1,15 +1,17 @@
-= Rust safe-libc
-Robert Gill <locke@sdf.org>
-:libc: https://crates.io/crates/libc[libc]
+# Rust safe-libc
 
-An attempt to make safe wrappers around the Rust {libc} library. It's
-mostly for my own personal use. I'll be adding functions as I find that
-I need them.
+_Safe wrappers around the `libc` crate._
+
+An attempt to make safe wrappers around the Rust [libc][libc] library.
+It's mostly for my own personal use. I'll be adding functions as I find
+that I need them.
+
+[libc]: https://crates.io/crates/libc
 
 
-== LICENSE
+## LICENSE
 
-Copyright (C) 2020 Robert Gill <locke@sdf.org>
+Copyright (C) 2020 Robert Gill <<locke@sdf.org>>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
