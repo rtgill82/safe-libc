@@ -1,6 +1,6 @@
 #
 # Created:  Thu 16 Apr 2020 01:17:47 PM PDT
-# Modified: Tue 28 Apr 2020 12:40:03 PM PDT
+# Modified: Tue 28 Apr 2020 12:42:45 PM PDT
 #
 # Copyright (C) 2020 Robert Gill <locke@sdf.org>
 #
@@ -26,9 +26,9 @@
 
 [package]
 name = "safe-libc"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Robert Gill <locke@sdf.org>"]
-description = "Safe wrappers around `libc` crate"
+description = "Safe wrappers around the `libc` crate"
 repository = "https://github.com/xelkarin/safe-libc/"
 license = "MIT"
 edition = "2018"
