@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:57:09 PM PDT
-// Modified: Sat 18 Apr 2020 04:59:27 PM PDT
+// Modified: Fri 14 Aug 2020 01:26:17 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -50,8 +50,21 @@ impl Group {
         self.grp.gr_gid
     }
 
-    pub fn gr_mem(&self) {
-        unimplemented!("Group.gr_mem() is not implemented")
+    pub fn gr_mem(&self) -> Option<Vec<&CStr>> {
+        unsafe {
+            if (*self.grp.gr_mem).is_null() {
+                return None;
+            }
+
+            let mut vec = Vec::new();
+            let mut p = self.grp.gr_mem;
+            while !(*p).is_null() {
+                vec.push(CStr::from_ptr(*p));
+                p = p.add(1);
+            }
+
+            Some(vec)
+        }
     }
 }
 
