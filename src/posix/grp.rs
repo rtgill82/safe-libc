@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:57:09 PM PDT
-// Modified: Fri 14 Aug 2020 01:26:17 PM PDT
+// Modified: Sat 15 Aug 2020 08:04:13 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -28,9 +28,8 @@ use std::ffi::CStr;
 use std::ptr;
 
 use crate::errno::{Error,Result};
-use crate::posix::unistd;
 use crate::stdlib::realloc;
-use crate::util::zeroed;
+use crate::util::*;
 
 pub struct Group {
     grp: libc::group,
@@ -82,7 +81,7 @@ pub fn getgrgid(gid: libc::gid_t) -> Result<Option<Group>> {
     unsafe {
         let mut grp: libc::group = zeroed();
         let mut result: *mut libc::group = ptr::null_mut();
-        let mut bufsize = getgr_r_size_max();
+        let mut bufsize = get_bufsize(BufType::Group);
         let mut buf = ptr::null_mut();
 
         loop {
@@ -105,13 +104,4 @@ pub fn getgrgid(gid: libc::gid_t) -> Result<Option<Group>> {
         }
         Ok(Some(Group { grp, buf }))
     }
-}
-
-fn getgr_r_size_max() -> usize {
-    use libc::_SC_GETGR_R_SIZE_MAX;
-
-    if let Ok(rv) = unistd::sysconf(_SC_GETGR_R_SIZE_MAX) {
-        return rv as usize;
-    }
-    libc::BUFSIZ as usize
 }

@@ -1,6 +1,6 @@
 //
 // Created:  Sat 18 Apr 2020 03:54:24 AM PDT
-// Modified: Sat 18 Apr 2020 03:59:58 AM PDT
+// Modified: Sat 15 Aug 2020 08:15:49 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -25,10 +25,23 @@
 //
 
 use std::mem::MaybeUninit;
+use crate::posix::unistd;
 
-#[allow(dead_code)]
+#[repr(i32)]
+pub(crate) enum BufType {
+    Group  = libc::_SC_GETGR_R_SIZE_MAX,
+    Passwd = libc::_SC_GETPW_R_SIZE_MAX
+}
+
 pub(crate) fn zeroed<T>() -> T {
     unsafe {
         MaybeUninit::zeroed().assume_init()
     }
+}
+
+pub(crate) fn get_bufsize(buftype: BufType) -> usize {
+    if let Ok(rv) = unistd::sysconf(buftype as i32) {
+        return rv as usize;
+    }
+    libc::BUFSIZ as usize
 }

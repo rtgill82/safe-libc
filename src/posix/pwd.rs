@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:05 PM PDT
-// Modified: Sat 18 Apr 2020 04:59:21 PM PDT
+// Modified: Sat 15 Aug 2020 08:04:45 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -28,9 +28,8 @@ use std::ffi::CStr;
 use std::ptr;
 
 use crate::errno::{Error,Result};
-use crate::posix::unistd;
 use crate::stdlib::realloc;
-use crate::util::zeroed;
+use crate::util::*;
 
 pub struct Passwd {
     pwd: libc::passwd,
@@ -81,7 +80,7 @@ pub fn getpwuid(uid: libc::uid_t) -> Result<Option<Passwd>> {
     unsafe {
         let mut pwd: libc::passwd = zeroed();
         let mut result: *mut libc::passwd = ptr::null_mut();
-        let mut bufsize = getpw_r_size_max();
+        let mut bufsize = get_bufsize(BufType::Passwd);
         let mut buf = ptr::null_mut();
 
         loop {
@@ -104,13 +103,4 @@ pub fn getpwuid(uid: libc::uid_t) -> Result<Option<Passwd>> {
         }
         Ok(Some(Passwd { pwd, buf }))
     }
-}
-
-fn getpw_r_size_max() -> usize {
-    use libc::_SC_GETPW_R_SIZE_MAX;
-
-    if let Ok(rv) = unistd::sysconf(_SC_GETPW_R_SIZE_MAX) {
-        return rv as usize;
-    }
-    libc::BUFSIZ as usize
 }
