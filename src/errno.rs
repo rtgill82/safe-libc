@@ -73,7 +73,8 @@ impl error::Error for Error { }
 
 impl fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Error {}: {}", self.errnum, self.errmsg)
+        write!(f, "Error {{ errmsg: \"{}\", errnum: {} }}",
+               self.errmsg, self.errnum)
     }
 }
 
