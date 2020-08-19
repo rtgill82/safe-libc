@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:57:09 PM PDT
-// Modified: Sat 15 Aug 2020 08:04:13 PM PDT
+// Modified: Tue 18 Aug 2020 08:38:34 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -24,7 +24,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-use std::ffi::CStr;
+use std::ffi::{CStr,CString};
 use std::ptr;
 
 use crate::errno::{Error,Result};
@@ -75,6 +75,39 @@ impl Drop for Group {
 
 pub fn getgid() -> libc::gid_t {
     unsafe { libc::getgid() }
+}
+
+pub fn getgrnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Group>> {
+    let cstring = CString::new(name).unwrap();
+    let cstr = cstring.as_c_str();
+
+    unsafe {
+        let mut grp: libc::group = zeroed();
+        let mut result: *mut libc::group = ptr::null_mut();
+        let mut bufsize = get_bufsize(BufType::Group);
+        let mut buf = ptr::null_mut();
+
+        loop {
+            buf = realloc(buf, bufsize)?;
+            let buf_i8 = buf as *mut i8;
+            let rv = libc::getgrnam_r(cstr.as_ptr(), &mut grp,
+                                      buf_i8, bufsize, &mut result);
+            if !result.is_null() {
+                break;
+            }
+
+            match rv {
+                0 => return Ok(None),
+                _ => {
+                    if rv != libc::ERANGE {
+                        return Err(Error::new(rv));
+                    }
+                    bufsize *= 2;
+                }
+            }
+        }
+        Ok(Some(Group { grp, buf }))
+    }
 }
 
 pub fn getgrgid(gid: libc::gid_t) -> Result<Option<Group>> {
