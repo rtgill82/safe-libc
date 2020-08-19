@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:05 PM PDT
-// Modified: Sat 15 Aug 2020 08:04:45 PM PDT
+// Modified: Tue 18 Aug 2020 08:21:03 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -24,7 +24,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-use std::ffi::CStr;
+use std::ffi::{CStr,CString};
 use std::ptr;
 
 use crate::errno::{Error,Result};
@@ -74,6 +74,39 @@ impl Drop for Passwd {
 
 pub fn getuid() -> libc::uid_t {
     unsafe { libc::getuid() }
+}
+
+pub fn getpwnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Passwd>> {
+    let cstring = CString::new(name).unwrap();
+    let cstr = cstring.as_c_str();
+
+    unsafe {
+        let mut pwd: libc::passwd = zeroed();
+        let mut result: *mut libc::passwd = ptr::null_mut();
+        let mut bufsize = get_bufsize(BufType::Passwd);
+        let mut buf = ptr::null_mut();
+
+        loop {
+            buf = realloc(buf, bufsize)?;
+            let buf_i8 = buf as *mut i8;
+            let rv = libc::getpwnam_r(cstr.as_ptr(), &mut pwd,
+                                      buf_i8, bufsize, &mut result);
+            if !result.is_null() {
+                break;
+            }
+
+            match rv {
+                0 => return Ok(None),
+                _ => {
+                    if rv != libc::ERANGE {
+                        return Err(Error::new(rv));
+                    }
+                    bufsize *= 2;
+                }
+            }
+        }
+        Ok(Some(Passwd { pwd, buf }))
+    }
 }
 
 pub fn getpwuid(uid: libc::uid_t) -> Result<Option<Passwd>> {
