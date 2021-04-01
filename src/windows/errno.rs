@@ -2,7 +2,7 @@
 // Created:  Sat 18 Apr 2020 03:04:00 AM PDT
 // Modified: Sat 18 Apr 2020 01:38:15 PM PDT
 //
-// Copyright (C) 2020 Robert Gill <locke@sdf.org>
+// Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
