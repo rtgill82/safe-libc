@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:19:12 PM PDT
-// Modified: Sun 19 Apr 2020 07:10:59 PM PDT
+// Modified: Fri 21 Nov 2025 01:17:44 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -24,6 +24,7 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+use std::ffi::NulError;
 use std::{cmp,fmt};
 use std::{error,result};
 
@@ -41,19 +42,22 @@ pub type Result<T> = result::Result<T, Error>;
 
 pub struct Error {
     errmsg: String,
-    errnum: i32
+    errnum: i32,
+    source: Option<NulError>
 }
 
 impl Error {
     pub fn new(errnum: i32) -> Error {
+        let source = None;
         match strerror(errnum) {
-            Ok(errmsg) => Error { errmsg, errnum },
+            Ok(errmsg) => Error { errmsg, errnum, source },
             Err(err) => err
         }
     }
 
     pub fn new_msg(errnum: i32, errmsg: String) -> Error {
-        Error { errmsg, errnum }
+        let source = None;
+        Error { errmsg, errnum, source }
     }
 
     pub fn errno() -> Error {
@@ -69,18 +73,38 @@ impl Error {
     }
 }
 
-impl error::Error for Error { }
+impl error::Error for Error {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        self.source.as_ref().map(|e| e as &dyn error::Error)
+    }
+}
 
 impl fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Error {{ errmsg: \"{}\", errnum: {} }}",
-               self.errmsg, self.errnum)
+        match &self.source {
+            Some(e) => <NulError as fmt::Debug>::fmt(e, f),
+            None => write!(f, "Error {{ errmsg: \"{}\", errnum: {} }}",
+                               self.errmsg, self.errnum)
+        }
     }
 }
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Error {}: {}", self.errnum, self.errmsg)
+        match &self.source {
+            Some(e) => write!(f, "Error: {}", e),
+            None => write!(f, "Error {}: {}", self.errnum, self.errmsg)
+        }
+    }
+}
+
+impl From<NulError> for Error {
+    fn from(value: NulError) -> Self {
+        Error {
+            errmsg: String::from("Interior NUL byte"),
+            errnum: 0,
+            source: Some(value)
+        }
     }
 }
 

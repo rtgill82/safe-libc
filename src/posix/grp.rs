@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:57:09 PM PDT
-// Modified: Fri 21 Nov 2025 12:18:53 PM PST
+// Modified: Fri 21 Nov 2025 12:52:55 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -82,7 +82,7 @@ pub fn getegid() -> libc::gid_t {
 }
 
 pub fn getgrnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Group>> {
-    let cstring = CString::new(name).unwrap();
+    let cstring = CString::new(name)?;
     let cstr = cstring.as_c_str();
 
     unsafe {

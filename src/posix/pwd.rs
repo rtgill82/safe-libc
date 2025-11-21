@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:05 PM PDT
-// Modified: Fri 21 Nov 2025 12:14:07 PM PST
+// Modified: Fri 21 Nov 2025 01:16:51 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -81,7 +81,7 @@ pub fn geteuid() -> libc::uid_t {
 }
 
 pub fn getpwnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Passwd>> {
-    let cstring = CString::new(name).unwrap();
+    let cstring = CString::new(name)?;
     let cstr = cstring.as_c_str();
 
     unsafe {
