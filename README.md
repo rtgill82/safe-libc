@@ -2,16 +2,16 @@
 
 _Safe wrappers around the `libc` crate._
 
-An attempt to make safe wrappers around the Rust [libc][libc] library.
-It's mostly for my own personal use. I'll be adding functions as I find
-that I need them.
+An attempt to make thin, safe wrappers around the Rust [libc][libc] library.
+It's mostly for my own personal use. I'll be adding functions as I find that
+I need them.
 
 [libc]: https://crates.io/crates/libc
 
 
 ## LICENSE
 
-Copyright (C) 2020 Robert Gill <<rtgill82@gmail.com>>
+Copyright (C) 2020,2025 Robert Gill <<rtgill82@gmail.com>>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to
