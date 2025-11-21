@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:05 PM PDT
-// Modified: Tue 18 Aug 2020 08:21:03 PM PDT
+// Modified: Fri 21 Nov 2025 12:00:26 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -74,6 +74,10 @@ impl Drop for Passwd {
 
 pub fn getuid() -> libc::uid_t {
     unsafe { libc::getuid() }
+}
+
+pub fn geteuid() -> libc::uid_t {
+    unsafe { libc::geteuid() }
 }
 
 pub fn getpwnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Passwd>> {

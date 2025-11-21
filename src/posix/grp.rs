@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:57:09 PM PDT
-// Modified: Tue 18 Aug 2020 08:38:34 PM PDT
+// Modified: Fri 21 Nov 2025 12:01:05 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -75,6 +75,10 @@ impl Drop for Group {
 
 pub fn getgid() -> libc::gid_t {
     unsafe { libc::getgid() }
+}
+
+pub fn getegid() -> libc::gid_t {
+    unsafe { libc::getegid() }
 }
 
 pub fn getgrnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Group>> {
