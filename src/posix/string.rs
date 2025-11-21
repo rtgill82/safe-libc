@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 11:55:31 PM PDT
-// Modified: Sun 19 Apr 2020 08:20:30 PM PDT
+// Modified: Fri 21 Nov 2025 02:36:29 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -25,7 +25,8 @@
 //
 
 use std::ffi::CString;
-use std::ptr;
+use std::{ptr,slice};
+use libc::c_void;
 
 use crate::stdlib::realloc;
 use crate::errno::{Error,Result};
@@ -54,16 +55,12 @@ pub fn strerror(errnum: i32) -> Result<String> {
             let errnum = rv2errnum!(rv);
 
             if errnum == 0 { // success
-                let buf = buf as *mut i8;
-                let string = CString::from_raw(buf)
-                    .to_string_lossy().to_string();
+                let string = c_void2string(buf);
                 return Ok(string);
             }
 
             if errnum == libc::EINVAL {
-                let buf = buf as *mut i8;
-                let string = CString::from_raw(buf)
-                    .to_string_lossy().to_string();
+                let string = c_void2string(buf);
                 return Err(Error::new_msg(errnum, string));
             }
 
@@ -91,6 +88,17 @@ pub(crate) fn strerror_s(errnum: i32) -> Result<String> {
         return Err(Error::new_msg(errnum, string));
     }
     Ok(string)
+}
+
+unsafe fn c_void2string(buf: *mut c_void) -> String {
+    let len = libc::strlen(buf as *mut i8) + 1;
+    let buf = buf as *const u8;
+    let vec: Vec<u8> = slice::from_raw_parts(buf, len).into();
+    let string = CString::from_vec_with_nul(vec).unwrap()
+        .to_string_lossy().to_string();
+
+    libc::free(buf as *mut c_void);
+    return string;
 }
 
 #[cfg(test)]
