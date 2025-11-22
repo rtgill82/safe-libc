@@ -1,6 +1,6 @@
 //
 // Created:  Sat 18 Apr 2020 03:54:24 AM PDT
-// Modified: Fri 21 Nov 2025 12:16:12 PM PST
+// Modified: Fri 21 Nov 2025 03:58:34 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -51,7 +51,7 @@ pub(crate) fn get_bufsize(buftype: BufType) -> usize {
 
 pub(crate) fn shrink_buf(ptr: VoidPtr) -> Result<VoidPtr> {
     unsafe {
-        let len = libc::strlen(ptr as *const i8);
+        let len = libc::strlen(ptr as *const i8) + 1;
         realloc(ptr, len)
     }
 }
