@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 11:55:31 PM PDT
-// Modified: Fri 21 Nov 2025 02:36:29 PM PST
+// Modified: Tue 25 Nov 2025 03:44:25 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -55,12 +55,12 @@ pub fn strerror(errnum: i32) -> Result<String> {
             let errnum = rv2errnum!(rv);
 
             if errnum == 0 { // success
-                let string = c_void2string(buf);
+                let string = c_void2string(buf)?;
                 return Ok(string);
             }
 
             if errnum == libc::EINVAL {
-                let string = c_void2string(buf);
+                let string = c_void2string(buf)?;
                 return Err(Error::new_msg(errnum, string));
             }
 
@@ -90,15 +90,15 @@ pub(crate) fn strerror_s(errnum: i32) -> Result<String> {
     Ok(string)
 }
 
-unsafe fn c_void2string(buf: *mut c_void) -> String {
+unsafe fn c_void2string(buf: *mut c_void) -> Result<String> {
     let len = libc::strlen(buf as *mut i8) + 1;
     let buf = buf as *const u8;
     let vec: Vec<u8> = slice::from_raw_parts(buf, len).into();
-    let string = CString::from_vec_with_nul(vec).unwrap()
+    let string = CString::from_vec_with_nul(vec)?
         .to_string_lossy().to_string();
 
     libc::free(buf as *mut c_void);
-    return string;
+    Ok(string)
 }
 
 #[cfg(test)]

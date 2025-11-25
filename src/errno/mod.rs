@@ -24,10 +24,13 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+use std::ffi::FromVecWithNulError;
 use std::ffi::NulError;
 use std::{cmp,fmt};
 use std::{error,result};
 
+mod source;
+use crate::errno::source::Source;
 use crate::string::strerror;
 
 #[cfg(target_family = "unix")]
@@ -43,12 +46,12 @@ pub type Result<T> = result::Result<T, Error>;
 pub struct Error {
     errmsg: String,
     errnum: i32,
-    source: Option<NulError>
+    source: Source
 }
 
 impl Error {
     pub fn new(errnum: i32) -> Error {
-        let source = None;
+        let source = Source::None;
         match strerror(errnum) {
             Ok(errmsg) => Error { errmsg, errnum, source },
             Err(err) => err
@@ -56,7 +59,7 @@ impl Error {
     }
 
     pub fn new_msg(errnum: i32, errmsg: String) -> Error {
-        let source = None;
+        let source = Source::None;
         Error { errmsg, errnum, source }
     }
 
@@ -75,16 +78,17 @@ impl Error {
 
 impl error::Error for Error {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        self.source.as_ref().map(|e| e as &dyn error::Error)
+        self.source.error_ref()
     }
 }
 
 impl fmt::Debug for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &self.source {
-            Some(e) => <NulError as fmt::Debug>::fmt(e, f),
-            None => write!(f, "Error {{ errmsg: \"{}\", errnum: {} }}",
-                               self.errmsg, self.errnum)
+            Source::FromVecWithNulError(e) => <FromVecWithNulError as fmt::Debug>::fmt(e, f),
+            Source::NulError(e) => <NulError as fmt::Debug>::fmt(e, f),
+            Source::None => write!(f, "Error {{ errmsg: \"{}\", errnum: {} }}",
+                                       self.errmsg, self.errnum)
         }
     }
 }
@@ -92,8 +96,19 @@ impl fmt::Debug for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &self.source {
-            Some(e) => write!(f, "Error: {}", e),
-            None => write!(f, "Error {}: {}", self.errnum, self.errmsg)
+            Source::FromVecWithNulError(e) => write!(f, "Error: {}", e),
+            Source::NulError(e) => write!(f, "Error: {}", e),
+            Source::None => write!(f, "Error {}: {}", self.errnum, self.errmsg)
+        }
+    }
+}
+
+impl From<FromVecWithNulError> for Error {
+    fn from(value: FromVecWithNulError) -> Self {
+        Error {
+            errmsg: String::from("Interior NUL byte"),
+            errnum: 0,
+            source: Source::FromVecWithNulError(value)
         }
     }
 }
@@ -103,7 +118,7 @@ impl From<NulError> for Error {
         Error {
             errmsg: String::from("Interior NUL byte"),
             errnum: 0,
-            source: Some(value)
+            source: Source::NulError(value)
         }
     }
 }
