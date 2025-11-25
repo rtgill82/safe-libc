@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:05 PM PDT
-// Modified: Fri 21 Nov 2025 01:16:51 PM PST
+// Modified: Fri 21 Nov 2025 12:00:26 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -109,8 +109,6 @@ pub fn getpwnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Passwd>> {
                 }
             }
         }
-
-        buf = shrink_buf(buf)?;
         Ok(Some(Passwd { pwd, buf }))
     }
 }
@@ -140,8 +138,6 @@ pub fn getpwuid(uid: libc::uid_t) -> Result<Option<Passwd>> {
                 }
             }
         }
-
-        buf = shrink_buf(buf)?;
         Ok(Some(Passwd { pwd, buf }))
     }
 }

@@ -1,6 +1,6 @@
 //
 // Created:  Sat 18 Apr 2020 03:54:24 AM PDT
-// Modified: Fri 21 Nov 2025 12:16:12 PM PST
+// Modified: Sat 15 Aug 2020 08:15:49 PM PDT
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -25,10 +25,7 @@
 //
 
 use std::mem::MaybeUninit;
-use crate::errno::Result;
 use crate::posix::unistd;
-use crate::stdlib::realloc;
-use crate::VoidPtr;
 
 #[repr(i32)]
 pub(crate) enum BufType {
@@ -47,11 +44,4 @@ pub(crate) fn get_bufsize(buftype: BufType) -> usize {
         return rv as usize;
     }
     libc::BUFSIZ as usize
-}
-
-pub(crate) fn shrink_buf(ptr: VoidPtr) -> Result<VoidPtr> {
-    unsafe {
-        let len = libc::strlen(ptr as *const i8);
-        realloc(ptr, len)
-    }
 }
