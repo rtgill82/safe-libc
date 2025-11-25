@@ -61,7 +61,7 @@ pub fn strerror(errnum: i32) -> Result<String> {
 
             if errnum == libc::EINVAL {
                 let string = c_void2string(buf)?;
-                return Err(Error::new_msg(errnum, string));
+                return Err(Error::with_msg(errnum, string));
             }
 
             // reallocate and try again
@@ -85,7 +85,7 @@ pub(crate) fn strerror_s(errnum: i32) -> Result<String> {
 
     let string = String::from_utf8_lossy(&buf).to_string();
     if errnum == libc::EINVAL {
-        return Err(Error::new_msg(errnum, string));
+        return Err(Error::with_msg(errnum, string));
     }
     Ok(string)
 }

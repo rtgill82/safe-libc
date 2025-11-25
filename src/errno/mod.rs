@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:19:12 PM PDT
-// Modified: Fri 21 Nov 2025 01:17:44 PM PST
+// Modified: Tue 25 Nov 2025 02:21:53 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -58,7 +58,7 @@ impl Error {
         }
     }
 
-    pub fn new_msg(errnum: i32, errmsg: String) -> Error {
+    pub fn with_msg(errnum: i32, errmsg: String) -> Error {
         let source = Source::None;
         Error { errmsg, errnum, source }
     }

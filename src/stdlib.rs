@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:13 PM PDT
-// Modified: Sun 19 Apr 2020 07:44:00 PM PDT
+// Modified: Tue 25 Nov 2025 02:24:55 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -42,7 +42,7 @@ macro_rules! try_alloc {
             true  => {
                 let errnum = errno::errno();
                 match strerror_s(errnum) {
-                    Ok(errmsg) => return Err(Error::new_msg(errnum, errmsg)),
+                    Ok(errmsg) => return Err(Error::with_msg(errnum, errmsg)),
                     Err(err) => return Err(err)
                 }
             }
