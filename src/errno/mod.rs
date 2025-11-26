@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:19:12 PM PDT
-// Modified: Fri 21 Nov 2025 01:17:44 PM PST
+// Modified: Wed 26 Nov 2025 03:02:25 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -65,6 +65,11 @@ impl Error {
 
     pub fn errno() -> Error {
         Error::new(errno())
+    }
+
+    #[cfg(target_family = "windows")]
+    pub fn doserrno() -> Error {
+        Error::new(doserrno())
     }
 
     pub fn msg(&self) -> &str {
