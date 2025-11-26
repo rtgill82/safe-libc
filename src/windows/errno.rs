@@ -1,6 +1,6 @@
 //
 // Created:  Sat 18 Apr 2020 03:04:00 AM PDT
-// Modified: Sat 18 Apr 2020 01:38:15 PM PDT
+// Modified: Wed 26 Nov 2025 03:34:59 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -24,52 +24,64 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+use libc::c_int;
+
 #[allow(non_camel_case_types)]
-pub type errno_t = libc::c_int;
+pub type errno_t = c_int;
 
 extern "C" {
-    fn __doserrno() -> *mut libc::c_ulong;
-    fn _errno() -> *mut libc::c_int;
+    fn _get_doserrno(errnum: *mut c_int) -> errno_t;
+    fn _set_doserrno(errnum: c_int) -> errno_t;
+    fn _get_errno(errnum: *mut c_int) -> errno_t;
+    fn _set_errno(errnum: c_int) -> errno_t;
 }
 
-pub fn doserrno() -> u64 {
-    unsafe { *__doserrno() as u64 }
+pub fn doserrno() -> c_int {
+    unsafe {
+        let mut errnum: c_int = 0;
+        _get_doserrno(&mut errnum);
+        errnum
+    }
 }
 
-pub fn errno() -> i32 {
-    unsafe { *_errno() }
+pub fn errno() -> c_int {
+    unsafe {
+        let mut errnum: c_int = 0;
+        _get_errno(&mut errnum);
+        errnum
+    }
 }
 
 pub fn zero() {
     unsafe {
-        *__doserrno() = 0;
-        *_errno() = 0;
+        _set_doserrno(0);
+        _set_errno(0);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::errno;
-    use super::__doserrno;
-    use super::_errno;
+    use super::_set_doserrno;
+    use super::_set_errno;
 
     #[test]
     fn test_doserrno() {
-        unsafe { *__doserrno() = libc::EACCES as u32; }
-        assert_eq!(errno::doserrno(), libc::EACCES as u64);
+        unsafe { _set_doserrno(libc::EACCES); }
+        assert_eq!(errno::doserrno(), libc::EACCES);
     }
 
     #[test]
     fn test_errno() {
-        unsafe { *_errno() = libc::EACCES; }
+        unsafe { _set_errno(libc::EACCES); }
         assert_eq!(errno::errno(), libc::EACCES);
     }
 
     #[test]
     fn test_zero() {
         unsafe {
-            *__doserrno() = libc::EACCES as u32;
-            *_errno() = libc::EACCES;
+            _set_doserrno(libc::EACCES);
+            _set_errno(libc::EACCES);
         }
 
         errno::zero();
