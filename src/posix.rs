@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 09:34:22 PM PDT
-// Modified: Sun 19 Apr 2020 04:38:18 PM PDT
+// Modified: Wed 26 Nov 2025 01:48:22 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -32,3 +32,4 @@ pub mod resource;
 #[doc(hidden)]
 pub mod string;
 pub mod unistd;
+pub(crate) mod util;
