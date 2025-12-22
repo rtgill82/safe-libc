@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:05 PM PDT
-// Modified: Fri 21 Nov 2025 12:00:26 PM PST
+// Modified: Mon 22 Dec 2025 03:47:15 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -30,6 +30,9 @@ use std::ptr;
 use crate::errno::{Error,Result};
 use crate::stdlib::realloc;
 use crate::util::*;
+use crate::grp;
+
+pub use libc::uid_t;
 
 pub struct Passwd {
     pwd: libc::passwd,
@@ -45,11 +48,11 @@ impl Passwd {
         unsafe { CStr::from_ptr(self.pwd.pw_passwd) }
     }
 
-    pub fn pw_uid(&self) -> libc::uid_t {
+    pub fn pw_uid(&self) -> uid_t {
         self.pwd.pw_uid
     }
 
-    pub fn pw_gid(&self) -> libc::gid_t {
+    pub fn pw_gid(&self) -> grp::gid_t {
         self.pwd.pw_gid
     }
 
@@ -72,11 +75,11 @@ impl Drop for Passwd {
     }
 }
 
-pub fn getuid() -> libc::uid_t {
+pub fn getuid() -> uid_t {
     unsafe { libc::getuid() }
 }
 
-pub fn geteuid() -> libc::uid_t {
+pub fn geteuid() -> uid_t {
     unsafe { libc::geteuid() }
 }
 
@@ -113,7 +116,7 @@ pub fn getpwnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Passwd>> {
     }
 }
 
-pub fn getpwuid(uid: libc::uid_t) -> Result<Option<Passwd>> {
+pub fn getpwuid(uid: uid_t) -> Result<Option<Passwd>> {
     unsafe {
         let mut pwd: libc::passwd = zeroed();
         let mut result: *mut libc::passwd = ptr::null_mut();
@@ -141,3 +144,8 @@ pub fn getpwuid(uid: libc::uid_t) -> Result<Option<Passwd>> {
         Ok(Some(Passwd { pwd, buf }))
     }
 }
+
+/*
+pub fn setreuid() -> Result<> {
+}
+*/

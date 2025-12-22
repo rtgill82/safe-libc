@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:57:09 PM PDT
-// Modified: Fri 21 Nov 2025 12:01:05 PM PST
+// Modified: Mon 22 Dec 2025 03:46:33 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -31,6 +31,8 @@ use crate::errno::{Error,Result};
 use crate::stdlib::realloc;
 use crate::util::*;
 
+pub use libc::gid_t;
+
 pub struct Group {
     grp: libc::group,
     buf: *mut libc::c_void
@@ -45,7 +47,7 @@ impl Group {
         unsafe { CStr::from_ptr(self.grp.gr_passwd) }
     }
 
-    pub fn gr_gid(&self) -> libc::gid_t {
+    pub fn gr_gid(&self) -> gid_t {
         self.grp.gr_gid
     }
 
@@ -73,11 +75,11 @@ impl Drop for Group {
     }
 }
 
-pub fn getgid() -> libc::gid_t {
+pub fn getgid() -> gid_t {
     unsafe { libc::getgid() }
 }
 
-pub fn getegid() -> libc::gid_t {
+pub fn getegid() -> gid_t {
     unsafe { libc::getegid() }
 }
 
@@ -114,7 +116,7 @@ pub fn getgrnam<T: Into<Vec<u8>>>(name: T) -> Result<Option<Group>> {
     }
 }
 
-pub fn getgrgid(gid: libc::gid_t) -> Result<Option<Group>> {
+pub fn getgrgid(gid: gid_t) -> Result<Option<Group>> {
     unsafe {
         let mut grp: libc::group = zeroed();
         let mut result: *mut libc::group = ptr::null_mut();
