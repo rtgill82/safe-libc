@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:19:57 PM PDT
-// Modified: Mon 22 Dec 2025 06:38:27 PM PST
+// Modified: Tue 23 Dec 2025 02:26:08 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -43,6 +43,9 @@ pub use posix::resource;
 #[cfg(target_family = "unix")]
 #[doc(inline)]
 pub use posix::signal;
+#[cfg(target_family = "unix")]
+#[doc(inline)]
+pub use posix::sys;
 #[cfg(target_family = "unix")]
 #[doc(inline)]
 pub use posix::unistd;

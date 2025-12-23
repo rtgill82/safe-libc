@@ -1,8 +1,8 @@
 //
-// Created:  Fri 17 Apr 2020 09:34:22 PM PDT
-// Modified: Tue 23 Dec 2025 02:25:37 PM PST
+// Created:  Tue 23 Dec 2025 02:25:19 PM PST
+// Modified: Tue 23 Dec 2025 02:25:19 PM PST
 //
-// Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
+// Copyright (C) 2025 Robert Gill <rtgill82@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -24,14 +24,8 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-#[doc(hidden)]
-pub mod errno;
-pub mod grp;
-pub mod pwd;
-pub mod resource;
-pub mod signal;
-#[doc(hidden)]
-pub mod string;
-pub mod sys;
-pub mod unistd;
-pub(crate) mod util;
+pub fn umask(mask: libc::mode_t) -> libc::mode_t {
+    unsafe {
+        libc::umask(mask)
+    }
+}
