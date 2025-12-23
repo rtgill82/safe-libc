@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 09:34:22 PM PDT
-// Modified: Wed 26 Nov 2025 01:48:22 PM PST
+// Modified: Mon 22 Dec 2025 06:38:43 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -29,6 +29,7 @@ pub mod errno;
 pub mod grp;
 pub mod pwd;
 pub mod resource;
+pub mod signal;
 #[doc(hidden)]
 pub mod string;
 pub mod unistd;

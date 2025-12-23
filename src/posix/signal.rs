@@ -1,8 +1,8 @@
 //
-// Created:  Thu 16 Apr 2020 01:19:57 PM PDT
-// Modified: Mon 22 Dec 2025 06:38:27 PM PST
+// Created:  Mon 22 Dec 2025 06:12:39 PM PST
+// Modified: Tue 23 Dec 2025 02:45:40 PM PST
 //
-// Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
+// Copyright (C) 2025 Robert Gill <rtgill82@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to
@@ -24,33 +24,44 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-pub mod errno;
-pub mod stdlib;
-pub mod string;
+use std::mem::MaybeUninit;
+use libc::{pid_t,c_int};
+use libc::sighandler_t;
+use crate::errno::{Error,Result};
 
-#[cfg(target_family = "unix")]
-#[doc(hidden)]
-pub mod posix;
-#[cfg(target_family = "unix")]
-#[doc(inline)]
-pub use posix::grp;
-#[cfg(target_family = "unix")]
-#[doc(inline)]
-pub use posix::pwd;
-#[cfg(target_family = "unix")]
-#[doc(inline)]
-pub use posix::resource;
-#[cfg(target_family = "unix")]
-#[doc(inline)]
-pub use posix::signal;
-#[cfg(target_family = "unix")]
-#[doc(inline)]
-pub use posix::unistd;
+pub fn kill(pid: pid_t, sig: c_int) -> Result<()> {
+    unsafe {
+        if libc::kill(pid, sig) == 0 {
+            Ok(())
+        } else {
+            Err(Error::errno())
+        }
+    }
+}
 
-#[cfg(target_family = "windows")]
-#[doc(hidden)]
-pub mod windows;
+pub fn sigaction(signum: c_int, act: &libc::sigaction)
+    -> Result<libc::sigaction>
+{
+    unsafe {
+        let mut oldact: libc::sigaction = MaybeUninit::zeroed().assume_init();
+        let oldact_p: *mut libc::sigaction = &mut oldact;
+        if libc::sigaction(signum, act, oldact_p) == 0 {
+            Ok(oldact)
+        } else {
+            Err(Error::errno())
+        }
+    }
+}
 
-mod util;
-
-type VoidPtr = *mut libc::c_void;
+pub fn signal(signum: c_int, handler: sighandler_t)
+    -> Result<sighandler_t>
+{
+    unsafe {
+        let rv = libc::signal(signum, handler);
+        if rv == libc::SIG_ERR {
+            Err(Error::errno())
+        } else {
+            Ok(rv)
+        }
+    }
+}
