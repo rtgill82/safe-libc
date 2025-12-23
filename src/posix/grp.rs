@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:57:09 PM PDT
-// Modified: Mon 22 Dec 2025 03:46:33 PM PST
+// Modified: Mon 22 Dec 2025 05:36:58 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -142,5 +142,15 @@ pub fn getgrgid(gid: gid_t) -> Result<Option<Group>> {
             }
         }
         Ok(Some(Group { grp, buf }))
+    }
+}
+
+pub fn setregid(rgid: gid_t, egid: gid_t) -> Result<()> {
+    unsafe {
+        if libc::setregid(rgid, egid) == 0 {
+            Ok(())
+        } else {
+            Err(Error::errno())
+        }
     }
 }

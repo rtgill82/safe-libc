@@ -1,6 +1,6 @@
 //
 // Created:  Thu 16 Apr 2020 01:20:05 PM PDT
-// Modified: Mon 22 Dec 2025 03:47:15 PM PST
+// Modified: Mon 22 Dec 2025 05:37:47 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -145,7 +145,12 @@ pub fn getpwuid(uid: uid_t) -> Result<Option<Passwd>> {
     }
 }
 
-/*
-pub fn setreuid() -> Result<> {
+pub fn setreuid(ruid: uid_t, euid: uid_t) -> Result<()> {
+    unsafe {
+        if libc::setreuid(ruid, euid) == 0 {
+            Ok(())
+        } else {
+            Err(Error::errno())
+        }
+    }
 }
-*/
