@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 07:26:13 PM PDT
-// Modified: Sat 18 Apr 2020 04:59:30 PM PDT
+// Modified: Tue 23 Dec 2025 12:24:49 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -48,22 +48,22 @@ pub fn getrlimit(resource: r_int) -> Result<(rlim, rlim)> {
     let mut rlimit: libc::rlimit = zeroed();
 
     unsafe {
-        if libc::getrlimit(resource, &mut rlimit) == -1 {
-            return Err(Error::errno());
+        if libc::getrlimit(resource, &mut rlimit) == 0 {
+            Ok((rlimit.rlim_cur, rlimit.rlim_max))
+        } else {
+            Err(Error::errno())
         }
-    };
-
-    Ok((rlimit.rlim_cur, rlimit.rlim_max))
+    }
 }
 
 pub fn setrlimit(resource: r_int, soft: rlim, hard: rlim) -> Result<()> {
     let rlimit = libc::rlimit { rlim_cur: soft, rlim_max: hard };
 
     unsafe {
-        if libc::setrlimit(resource, &rlimit) == -1 {
+        if libc::setrlimit(resource, &rlimit) == 0 {
+            Ok(())
+        } else {
             return Err(Error::errno());
         }
-    };
-
-    Ok(())
+    }
 }
