@@ -1,6 +1,6 @@
 //
 // Created:  Fri 17 Apr 2020 09:29:29 PM PDT
-// Modified: Sat 18 Apr 2020 05:01:06 PM PDT
+// Modified: Tue 23 Dec 2025 12:48:38 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -24,14 +24,22 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-use crate::errno::{Error,Result};
+use libc::{c_int,c_long};
 
-pub fn sysconf(name: i32) -> Result<i64> {
+use crate::errno::{Error,Result};
+use crate::errno;
+
+pub fn sysconf(name: c_int) -> Result<Option<c_long>> {
     unsafe {
+        errno::zero();
+
         let rv = libc::sysconf(name);
-        if rv == -1 {
-            return Err(Error::errno());
+        if rv == -1 && errno::errno() == 0 {
+            Ok(None)
+        } else if rv == -1 {
+            Err(Error::errno())
+        } else {
+            Ok(Some(rv))
         }
-        return Ok(rv as i64);
     }
 }

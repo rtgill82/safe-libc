@@ -1,6 +1,6 @@
 //
 // Created:  Sat 18 Apr 2020 03:54:24 AM PDT
-// Modified: Tue 23 Dec 2025 12:28:20 PM PST
+// Modified: Tue 23 Dec 2025 12:50:53 PM PST
 //
 // Copyright (C) 2020 Robert Gill <rtgill82@gmail.com>
 //
@@ -41,7 +41,10 @@ pub(crate) fn zeroed<T>() -> T {
 
 pub(crate) fn get_bufsize(buftype: BufType) -> usize {
     match unistd::sysconf(buftype as i32) {
-        Ok(rv) => rv as usize,
+        Ok(opt) => match opt {
+            Some(rv) => rv as usize,
+            None => libc::BUFSIZ as usize,
+        },
         Err(_) => libc::BUFSIZ as usize
     }
 }
